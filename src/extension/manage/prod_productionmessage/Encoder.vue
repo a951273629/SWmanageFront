@@ -35,7 +35,6 @@
 					:disabled="true"
 				>
 				</el-input>
-				<p class="number-length" >{{numberLength }}</p>
 			</div>
 			<el-button type="primary" @click="encode" class="apply-code"
 				>申请编码
@@ -47,12 +46,13 @@
 	import VolBox from "@/components/basic/VolBox.vue";
 	import { ElMessage } from "element-plus";
 	import http from "@/api/http.js";
+	// import EventBus from '@/uitils/eventBus';
 	import { ref, defineComponent } from "vue";
 	export default {
 		components: {
 			VolBox
 		},
-		props: {},
+		// props:["model1"],
 		data() {
 			return {
 				model1: false,
@@ -71,12 +71,23 @@
 				inputNumber: null,
 				// 编码器生成的 编码
 				codeString: "",
-				result: {},
-				numberLength:""
+				// 申请编码返回的对象
+				result: {}
 			};
 		},
+		// computed: {
+		// 	model1() {
+		// 		return this.$store.state.modelBoole;
+		// 		// 或者 return this.$store.getter.count2
+		// 	}
+		// },
+		// ...mapState({
+		// 	//箭头函数方便简介推荐使用
+		// 	model1: (state) => state.modelBoole
+		// }),
 		methods: {
 			open_encoder() {
+				console.log("调用了");
 				this.model1 = true;
 			},
 			async encode() {
@@ -93,14 +104,12 @@
 					"/api/CatalogTree/GetCode",
 					this.submit
 				);
-				this.$Message.success(`生成的编码为:${this.result.partNumber}`);
-				// console.log(JSON.stringify(this.result));
-				this.inputNumber=this.result.serialNumber;
-				this.$parent.input = this.result.partNumber;
-				//
-				this.result.serialNumber=this.result.serialNumber-1;
+				this.codeString = this.result.partNumber;
+				this.$parent.input = this.codeString;
+				this.$Message.success(`生成的编码为:${this.codeString}`);
+				this.inputNumber++;
+
 				this.$store.commit("setRecord", this.result);
-			
 			},
 			// 选中一条数据时 校验一下
 			async handleChange(value) {
@@ -126,9 +135,13 @@
 					"api/CatalogTree/GetSerialNumber",
 					{ Id: value[value.length - 1] }
 				);
-				this.numberLength = `${this.inputNumber}`.length;
-				this.numberLength = "长度:"+this.numberLength;
 			}
+		},
+		// 全局事件总线弹出框
+		created() {
+			// this.$on('popBox', (modelBoole=true) => {
+			// 	this.model1 = modelBoole;
+			// });
 		},
 		async mounted() {
 			// 页面加载时获取数据
@@ -138,6 +151,10 @@
 				true
 			);
 			this.options = CatalogTree;
+		},
+		beforeDestroy() {
+			console.log("页面销毁了");
+			this.model1 = false;
 		}
 	};
 </script>
@@ -166,23 +183,15 @@
 		margin-top: 3.5%;
 		margin-left: 20%;
 		position: relative;
-		.demonstration {
-			display: inline-block;
-			margin-top: 1%;
-			// margin-right: 2%;
-		}
 		.input-number {
 			margin-left: 4.5%;
 			width: 39.3%;
 			position: absolute;
 		}
-
-		.number-length{
-			position: absolute;
+		.demonstration {
 			display: inline-block;
 			margin-top: 1%;
-			margin-left: 1%;
-			right: 34%;
+			// margin-right: 2%;
 		}
 	}
 	.apply-code {

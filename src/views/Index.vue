@@ -20,7 +20,7 @@
     </div>
     <div class="vol-container" :style="{ left: menuWidth - 1 + 'px' }">
       <div class="vol-header">
-        <div class="project-name">VOL开发框架Vue3.x版本</div>
+        <div class="project-name">生信科技制造型企业管理系统</div>
         <div class="header-text">
           <div class="h-link">
             <a

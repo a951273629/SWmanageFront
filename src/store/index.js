@@ -13,7 +13,8 @@ export default createStore({
     data: {},
     permission: [],
     isLoading: false,//2020.06.03增加路由切换时加载提示
-    userInfo: null
+    userInfo: null,
+    RecordResult:{}
   },
   mutations: {
     setPermission(state, data) {  //调用方式 this.$store.commit('setPermission', data)
@@ -37,6 +38,10 @@ export default createStore({
     },
     updateLoadingState(state, flag) {
       state.isLoading = flag
+    },
+    setRecord(state,data){
+        console.log("vuex设置Record被更改了");
+        state.RecordResult=data;
     }
   }, getters: {
     getPermission: (state) => (path) => {  //调用方式 store.getters.getPermission('sys_User')
@@ -75,6 +80,9 @@ export default createStore({
     getData: (state) => () => {
       return state.data;
     },
+    getPopBox:(state)=>()=>{
+      return state.modelBoole;
+    }
   }, actions: {
     setPermission(context, data) {
       context.commit('setPermission', data); //调用方式 store.dispatch('push')

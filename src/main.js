@@ -61,3 +61,7 @@ app.use(store)
     .mount('#app');
 app.config.globalProperties.$Message = app.config.globalProperties.$message;
 
+// 全局事件总线
+// const eventBus = createApp({});
+// app.config.globalProperties.$eventBus = eventBus;
+

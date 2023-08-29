@@ -9,7 +9,9 @@
 import { h, resolveComponent } from "vue";
 import { ElMessage } from "element-plus";
 import Encoder from "./Encoder.vue";
-
+import http from "@/api/http.js";
+// import { Date } from "core-js/es6";
+import base from '@/uitils/common'
 let extension = {
 	components: {
 		//查询界面扩展组件
@@ -50,6 +52,85 @@ let extension = {
 					// this.$refs.Encoder.open_encoder();
 				}
 			});
+
+
+			// 获取显示的长度的页面组件
+			let NumberLength=this.getOption("SerialNumberLength")
+
+			NumberLength.click =()=>{
+				ElMessage.success("input框数值变动了");
+			}
+			// 默认不显示
+			NumberLength.disabled =true;
+
+			// 获取物料规则显示的字段
+			let ruleType = this.getOption("RuleTypeCode");
+			
+
+			ruleType.onChange = (val, option)=>{
+				// val等于2 表示选中的是子级
+				if(val ==="2"){
+					NumberLength.disabled =false;
+					return;
+				}
+				NumberLength.disabled =true;
+			}
+			// 监听输入
+			NumberLength.onKeyPress = ($event,val) => {
+				// console.log(JSON.stringify(this.editFormFields.SerialNumberLength));
+				if(this.editFormFields.SerialNumberLength<2){
+					ElMessage.error("流水号最小不能小于10");
+					setTimeout(()=>{
+						this.editFormFields.SerialNumberLength=2;
+					},0)
+					return;
+				}
+				if(this.editFormFields.SerialNumberLength>12){
+					ElMessage.error("流水号最大不能超过12位");
+					setTimeout(()=>{
+						this.editFormFields.SerialNumberLength=12;
+					},0)
+					return;
+				}
+				let Number =10**(this.editFormFields.SerialNumberLength-1);
+				this.editFormFields.InitialSerialNumber =Number
+				this.editFormFields.LastSerialNumber=Number
+			  }
+			// 获取物料编码参与编码的字段
+			let CatalogCode = this.getOption("CatalogTypeCode");
+			CatalogCode.blur= async ()=>{
+				// !取反判空
+				if(!this.editFormFields.CatalogTypeCode){
+					// ElMessage.error("编码字段不可以为空，请输入一个编码");
+					return;
+				}
+				let message ="子编码";
+				let IDs =this.editFormFields.ParentID;
+				//如果没有选择父级 那么父级就为根节点
+				if(!IDs||IDs.length===0){
+					message="根编码"
+					IDs=[0];
+				}
+				let param ={
+					id:IDs[IDs.length-1],
+					catalogTypeCode:this.editFormFields.CatalogTypeCode
+				}
+				// ElMessage.success(JSON.stringify())
+				let result=await http.post("/api/CatalogTree/IsSameTypeCode",param);
+				if(result){
+					// 重复编码清空
+					ElMessage.error("当前编码重复不可用");
+					this.editFormFields.CatalogTypeCode="";
+					return
+				}
+				ElMessage.success(`当前编码可以使用:${message}`)
+			}
+		
+
+			// CatalogCode.onKeyPress =()=>{
+			// 	ElMessage.success("按下了某键");
+			// }
+
 		},
 		onInited() {
 			// 获取行数据
@@ -70,6 +151,8 @@ let extension = {
 		},
 		addBefore(formData) {
 			//新建保存前formData为对象，包括明细表，可以给给表单设置值，自己输出看formData的值
+			console.log("保存前",formData);
+
 			return true;
 		},
 		updateBefore(formData) {
@@ -97,11 +180,26 @@ let extension = {
 			// this.$refs.table.$refs.table.toggleRowSelection(row); //单击行时选中当前行;
 		},
 		modelOpenAfter(row) {
+
+			// setTimeout(()=>{
+			// 	this.$refs.form.$refs.CatalogTypeCode[0].blur =()=>{
+			// 		ElMessage.success("失去焦点");
+			// 	}
+			// },300)
+			// setTimeout(()=>{
+			// 	this.$refs.form.$refs.CatalogTypeCode[0].onKeyPress =()=>{
+			// 		ElMessage.success("按下了某键");
+			// 	}
+			// },100)
+
 			//获取当前弹出框是新建还是编辑状态
 			let isEDIT = this.currentAction == this.const.EDIT;
-
 			//新增状态 设置默认值
 			if (!isEDIT) {
+			   
+				this.editFormFields.CreatedTime= this.base.getDate(true);
+				this.editFormFields.ModifiedTime= this.base.getDate(true);
+				
 				this.editFormFields.Remark="新增物料";
 				this.editFormFields.InitialSerialNumber=100000;
 				this.editFormFields.LastSerialNumber=100000;
@@ -110,14 +208,33 @@ let extension = {
 				this.editFormFields.CreatedBy=1;
 				this.editFormFields.ModifiedBy=1;
 				this.editFormFields.Version=1;
+				this.editFormFields.SerialNumberLength =6
+				// console.log("formRules:",JSON.stringify(this.formRules));
+				console.log("this.editFormFields",JSON.stringify(this.editFormFields));
+
 			}
+			// 获取物料编码参与编码的字段
+			let CatalogCode = this.getOption("CatalogTypeCode");
+
+			// CatalogCode.Onblur = 
 			//点击编辑、新建按钮弹出框后，可以在此处写逻辑，如，从后台获取数据
 			//(1)判断是编辑还是新建操作： this.currentAction=='Add';
 			//(2)给弹出框设置默认值
 			//(3)this.editFormFields.字段='xxx';
 			//如果需要给下拉框设置默认值，请遍历this.editFormOptions找到字段配置对应data属性的key值
 			//看不懂就把输出看：console.log(this.editFormOptions)
-		}
+		},
+		getOption(field) {
+			let option;
+			this.editFormOptions.forEach(x => {
+			  x.forEach(item => {
+				if (item.field == field) {
+				  option = item;
+				}
+			  })
+			})
+			return option;
+		},
 	}
 };
 export default extension;

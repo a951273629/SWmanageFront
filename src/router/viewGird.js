@@ -150,6 +150,14 @@ let viewgird = [
         path: '/Catalog_Record',
         name: 'Catalog_Record',
         component: () => import('@/views/manage/catalog_record/Catalog_Record.vue')
+    }    ,{
+        path: '/Prod_ProductionMessage',
+        name: 'Prod_ProductionMessage',
+        component: () => import('@/views/manage/prod_productionmessage/Prod_ProductionMessage.vue')
+    }    ,{
+        path: '/Prod_MaterialMessage',
+        name: 'Prod_MaterialMessage',
+        component: () => import('@/views/manage/prod_materialmessage/Prod_MaterialMessage.vue')
     }]
 
 export default viewgird

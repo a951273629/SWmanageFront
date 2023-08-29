@@ -39,12 +39,13 @@
                        {field:'ItemVersion',title:'产品物料的版本',type:'int',width:110,align:'left'},
                        {field:'PartNumber',title:'完整的物料编码 ，1-AA.BB-000001',type:'string',width:110,align:'left'},
                        {field:'CompletedTypeCode',title:'完整的物料分类,如 一级 二级 三级   1-AA.BB',type:'string',width:110,align:'left'},
-                       {field:'SerialNumber',title:'编码流水号',type:'int',width:110,align:'left'},
+                       {field:'SerialNumber',title:'编码流水号',type:'long',width:110,align:'left'},
                        {field:'CreatedTime',title:'创建时间',type:'datetime',width:150,align:'left',sort:true},
                        {field:'CreatedBy',title:'创建者',type:'string',bind:{ key:'roles',data:[]},width:110,align:'left'},
                        {field:'ModifiedDate',title:'修改时间',type:'datetime',width:150,align:'left',sort:true},
                        {field:'ModifiedBy',title:'修改者',type:'string',width:110,align:'left'},
-                       {field:'Remark',title:'备注',type:'string',width:110,align:'left'}]);
+                       {field:'Remark',title:'备注',type:'string',width:110,align:'left'},
+                       {field:'DataSource',title:'编码来源',type:'string',bind:{ key:'编码来源',data:[]},width:110,align:'left'}]);
             const detail = ref({
                 cnName: "#detailCnName",
                 table: "#detailTable",
